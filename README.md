@@ -1,6 +1,6 @@
 # Elastic stack (ELK) on Docker
 
-[![Elastic Stack version](https://img.shields.io/badge/Elastic%20Stack-8.0.1-00bfb3?style=flat&logo=elastic-stack)](https://www.elastic.co/blog/category/releases)
+[![Elastic Stack version](https://img.shields.io/badge/Elastic%20Stack-8.1.1-00bfb3?style=flat&logo=elastic-stack)](https://www.elastic.co/blog/category/releases)
 [![Build Status](https://github.com/deviantony/docker-elk/workflows/CI/badge.svg?branch=main)](https://github.com/deviantony/docker-elk/actions?query=workflow%3ACI+branch%3Amain)
 [![Join the chat at https://gitter.im/deviantony/docker-elk](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/deviantony/docker-elk?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -75,8 +75,8 @@ own_. [sherifabdlnaby/elastdocker][elastdocker] is one example among others of p
 
 ### Host setup
 
-* [Docker Engine](https://docs.docker.com/install/) version **18.06.0** or newer
-* [Docker Compose](https://docs.docker.com/compose/install/) version **1.26.0** or newer
+* [Docker Engine][docker-install] version **18.06.0** or newer
+* [Docker Compose][compose-install] version **1.26.0** or newer (including [Compose V2][compose-v2])
 * 1.5 GB of RAM
 
 *:information_source: Especially on Linux, make sure your user has the [required permissions][linux-postinstall] to
@@ -409,7 +409,10 @@ See the following Wiki pages:
 
 [elastdocker]: https://github.com/sherifabdlnaby/elastdocker
 
-[linux-postinstall]: https://docs.docker.com/install/linux/linux-postinstall/
+[docker-install]: https://docs.docker.com/get-docker/
+[compose-install]: https://docs.docker.com/compose/install/
+[compose-v2]: https://docs.docker.com/compose/cli-command/
+[linux-postinstall]: https://docs.docker.com/engine/install/linux-postinstall/
 
 [booststap-checks]: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
 [es-sys-config]: https://www.elastic.co/guide/en/elasticsearch/reference/current/system-config.html
