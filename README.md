@@ -1,6 +1,6 @@
 # Elastic stack (ELK) on Docker
 
-[![Elastic Stack version](https://img.shields.io/badge/Elastic%20Stack-8.3.3-00bfb3?style=flat&logo=elastic-stack)](https://www.elastic.co/blog/category/releases)
+[![Elastic Stack version](https://img.shields.io/badge/Elastic%20Stack-8.4.1-00bfb3?style=flat&logo=elastic-stack)](https://www.elastic.co/blog/category/releases)
 [![Build Status](https://github.com/deviantony/docker-elk/workflows/CI/badge.svg?branch=main)](https://github.com/deviantony/docker-elk/actions?query=workflow%3ACI+branch%3Amain)
 [![Join the chat at https://gitter.im/deviantony/docker-elk](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/deviantony/docker-elk?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -99,7 +99,7 @@ By default, the stack exposes the following ports:
 * 5601: Kibana
 
 > **Warning**  
-> Elasticsearch's [bootstrap checks][booststap-checks] were purposely disabled to facilitate the setup of the Elastic
+> Elasticsearch's [bootstrap checks][bootstrap-checks] were purposely disabled to facilitate the setup of the Elastic
 > stack in development environments. For production setups, we recommend users to set up their host according to the
 > instructions from the Elasticsearch documentation: [Important System Configuration][es-sys-config].
 
@@ -430,7 +430,7 @@ See the following Wiki pages:
 [compose-v2]: https://docs.docker.com/compose/cli-command/
 [linux-postinstall]: https://docs.docker.com/engine/install/linux-postinstall/
 
-[booststap-checks]: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+[bootstrap-checks]: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
 [es-sys-config]: https://www.elastic.co/guide/en/elasticsearch/reference/current/system-config.html
 [es-heap]: https://www.elastic.co/guide/en/elasticsearch/reference/current/important-settings.html#heap-size-settings
 
