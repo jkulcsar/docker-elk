@@ -3,7 +3,7 @@
 set -eu
 set -o pipefail
 
-source "$(dirname "${BASH_SOURCE[0]}")/helpers.sh"
+source "${BASH_SOURCE[0]%/*}"/helpers.sh
 
 
 # --------------------------------------------------------
@@ -13,11 +13,20 @@ declare -A users_passwords
 users_passwords=(
 	[logstash_internal]="${LOGSTASH_INTERNAL_PASSWORD:-}"
 	[kibana_system]="${KIBANA_SYSTEM_PASSWORD:-}"
+	[metricbeat_internal]="${METRICBEAT_INTERNAL_PASSWORD:-}"
+	[filebeat_internal]="${FILEBEAT_INTERNAL_PASSWORD:-}"
+	[heartbeat_internal]="${HEARTBEAT_INTERNAL_PASSWORD:-}"
+	[monitoring_internal]="${MONITORING_INTERNAL_PASSWORD:-}"
+	[beats_system]="${BEATS_SYSTEM_PASSWORD=:-}"
 )
 
 declare -A users_roles
 users_roles=(
 	[logstash_internal]='logstash_writer'
+	[metricbeat_internal]='metricbeat_writer'
+	[filebeat_internal]='filebeat_writer'
+	[heartbeat_internal]='heartbeat_writer'
+	[monitoring_internal]='remote_monitoring_collector'
 )
 
 # --------------------------------------------------------
@@ -26,16 +35,23 @@ users_roles=(
 declare -A roles_files
 roles_files=(
 	[logstash_writer]='logstash_writer.json'
+	[metricbeat_writer]='metricbeat_writer.json'
+	[filebeat_writer]='filebeat_writer.json'
+	[heartbeat_writer]='heartbeat_writer.json'
 )
 
 # --------------------------------------------------------
 
 
-echo "-------- $(date) --------"
+echo "-------- $(date --rfc-3339=seconds) --------"
 
-state_file="$(dirname "${BASH_SOURCE[0]}")/state/.done"
+state_file="${BASH_SOURCE[0]%/*}"/state/.done
 if [[ -e "$state_file" ]]; then
-	log "State file exists at '${state_file}', skipping setup"
+	declare state_birthtime
+	state_birthtime="$(stat -c '%Y' "$state_file")"
+	state_birthtime="$(date --rfc-3339=seconds --date="@${state_birthtime}")"
+
+	log "Setup has already run successfully on ${state_birthtime}. Skipping"
 	exit 0
 fi
 
@@ -65,11 +81,22 @@ fi
 
 sublog 'Elasticsearch is running'
 
+log 'Waiting for initialization of built-in users'
+
+wait_for_builtin_users || exit_code=$?
+
+if ((exit_code)); then
+	suberr 'Timed out waiting for condition'
+	exit $exit_code
+fi
+
+sublog 'Built-in users were initialized'
+
 for role in "${!roles_files[@]}"; do
 	log "Role '$role'"
 
 	declare body_file
-	body_file="$(dirname "${BASH_SOURCE[0]}")/roles/${roles_files[$role]:-}"
+	body_file="${BASH_SOURCE[0]%/*}/roles/${roles_files[$role]:-}"
 	if [[ ! -f "${body_file:-}" ]]; then
 		sublog "No role body found at '${body_file}', skipping"
 		continue
@@ -94,7 +121,7 @@ for user in "${!users_passwords[@]}"; do
 		set_user_password "$user" "${users_passwords[$user]}"
 	else
 		if [[ -z "${users_roles[$user]:-}" ]]; then
-			err '  No role defined, skipping creation'
+			suberr '  No role defined, skipping creation'
 			continue
 		fi
 
@@ -103,5 +130,5 @@ for user in "${!users_passwords[@]}"; do
 	fi
 done
 
-mkdir -p "$(dirname "${state_file}")"
+mkdir -p "${state_file%/*}"
 touch "$state_file"

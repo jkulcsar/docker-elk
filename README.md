@@ -1,6 +1,6 @@
 # Elastic stack (ELK) on Docker
 
-[![Elastic Stack version](https://img.shields.io/badge/Elastic%20Stack-8.5.0-00bfb3?style=flat&logo=elastic-stack)](https://www.elastic.co/blog/category/releases)
+[![Elastic Stack version](https://img.shields.io/badge/Elastic%20Stack-8.5.3-00bfb3?style=flat&logo=elastic-stack)](https://www.elastic.co/blog/category/releases)
 [![Build Status](https://github.com/deviantony/docker-elk/workflows/CI/badge.svg?branch=main)](https://github.com/deviantony/docker-elk/actions?query=workflow%3ACI+branch%3Amain)
 [![Join the chat at https://gitter.im/deviantony/docker-elk](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/deviantony/docker-elk?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -12,10 +12,10 @@ the visualization power of Kibana.
 ![Animated demo](https://user-images.githubusercontent.com/3299086/155972072-0c89d6db-707a-47a1-818b-5f976565f95a.gif)
 
 > **Note**  
-> The Docker images backing this stack include [X-Pack][xpack] with [paid features][paid-features] enabled by default
-> (see [How to disable paid features](#how-to-disable-paid-features) to disable them). **The [trial
-> license][trial-license] is valid for 30 days**. After this license expires, you can continue using the free features
-> seamlessly, without losing any data.
+> [Platinum][subscriptions] features are enabled by default for a [trial][license-mngmt] duration of **30 days**. After
+> this evaluation period, you will retain access to all the free features included in the Open Basic license seamlessly,
+> without manual intervention required, and without losing any data. Refer to the [How to disable paid
+> features](#how-to-disable-paid-features) section to opt out of this behaviour.
 
 Based on the official Docker images from Elastic:
 
@@ -25,7 +25,8 @@ Based on the official Docker images from Elastic:
 
 Other available stack variants:
 
-* [`tls`](https://github.com/deviantony/docker-elk/tree/tls): TLS encryption enabled in Elasticsearch
+* [`tls`](https://github.com/deviantony/docker-elk/tree/tls): TLS encryption enabled in Elasticsearch, Kibana (opt in),
+  and Fleet
 * [`searchguard`](https://github.com/deviantony/docker-elk/tree/searchguard): Search Guard support
 
 ---
@@ -62,6 +63,7 @@ own_. [sherifabdlnaby/elastdocker][elastdocker] is one example among others of p
    * [How to configure Logstash](#how-to-configure-logstash)
    * [How to disable paid features](#how-to-disable-paid-features)
    * [How to scale out the Elasticsearch cluster](#how-to-scale-out-the-elasticsearch-cluster)
+   * [How to re-execute the setup](#how-to-re-execute-the-setup)
    * [How to reset a password programmatically](#how-to-reset-a-password-programmatically)
 1. [Extensibility](#extensibility)
    * [How to add plugins](#how-to-add-plugins)
@@ -162,7 +164,7 @@ reset the passwords of all aforementioned Elasticsearch users to random secrets.
 
 1. Reset passwords for default users
 
-    The commands below resets the passwords of the `elastic`, `logstash_internal` and `kibana_system` users. Take note
+    The commands below reset the passwords of the `elastic`, `logstash_internal` and `kibana_system` users. Take note
     of them.
 
     ```console
@@ -318,7 +320,7 @@ containers: [Configuring Logstash for Docker][ls-docker].
 ### How to disable paid features
 
 Switch the value of Elasticsearch's `xpack.license.self_generated.type` setting from `trial` to `basic` (see [License
-settings][trial-license]).
+settings][license-settings]).
 
 You can also cancel an ongoing trial before its expiry date — and thus revert to a basic license — either from the
 [License Management][license-mngmt] panel of Kibana, or using Elasticsearch's [Licensing APIs][license-apis].
@@ -326,6 +328,35 @@ You can also cancel an ongoing trial before its expiry date — and thus revert 
 ### How to scale out the Elasticsearch cluster
 
 Follow the instructions from the Wiki: [Scaling out Elasticsearch](https://github.com/deviantony/docker-elk/wiki/Elasticsearch-cluster)
+
+### How to re-execute the setup
+
+To run the setup container again and re-initialize all users for which a password was defined inside the `.env` file,
+delete its volume and "up" the `setup` Compose service again manually:
+
+```console
+$ docker-compose rm -f setup
+ ⠿ Container docker-elk-setup-1  Removed
+```
+
+```console
+$ docker volume rm docker-elk_setup
+docker-elk_setup
+```
+
+```console
+$ docker-compose up setup
+ ⠿ Volume "docker-elk_setup"             Created
+ ⠿ Container docker-elk-elasticsearch-1  Running
+ ⠿ Container docker-elk-setup-1          Created
+Attaching to docker-elk-setup-1
+...
+docker-elk-setup-1  | [+] User 'monitoring_internal'
+docker-elk-setup-1  |    ⠿ User does not exist, creating
+docker-elk-setup-1  | [+] User 'beats_system'
+docker-elk-setup-1  |    ⠿ User exists, setting password
+docker-elk-setup-1 exited with code 0
+```
 
 ### How to reset a password programmatically
 
@@ -416,10 +447,9 @@ See the following Wiki pages:
 * [Popular integrations](https://github.com/deviantony/docker-elk/wiki/Popular-integrations)
 
 [elk-stack]: https://www.elastic.co/what-is/elk-stack
-[xpack]: https://www.elastic.co/what-is/open-x-pack
-[paid-features]: https://www.elastic.co/subscriptions
+[subscriptions]: https://www.elastic.co/subscriptions
 [es-security]: https://www.elastic.co/guide/en/elasticsearch/reference/current/security-settings.html
-[trial-license]: https://www.elastic.co/guide/en/elasticsearch/reference/current/license-settings.html
+[license-settings]: https://www.elastic.co/guide/en/elasticsearch/reference/current/license-settings.html
 [license-mngmt]: https://www.elastic.co/guide/en/kibana/current/managing-licenses.html
 [license-apis]: https://www.elastic.co/guide/en/elasticsearch/reference/current/licensing-apis.html
 
@@ -427,7 +457,7 @@ See the following Wiki pages:
 
 [docker-install]: https://docs.docker.com/get-docker/
 [compose-install]: https://docs.docker.com/compose/install/
-[compose-v2]: https://docs.docker.com/compose/cli-command/
+[compose-v2]: https://docs.docker.com/compose/compose-v2/
 [linux-postinstall]: https://docs.docker.com/engine/install/linux-postinstall/
 
 [bootstrap-checks]: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
